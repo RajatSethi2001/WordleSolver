@@ -1,7 +1,9 @@
-from nltk.corpus import words
 import copy
 
-word_set = set(words.words())
+with open("five-letter-words.txt", "r") as words:
+    data = words.read().splitlines()
+    word_set = set(data)
+
 for word in copy.deepcopy(word_set):
     if (len(word) != 5 or word[0].isupper()):
         word_set.remove(word)
@@ -95,16 +97,13 @@ def update(word_rec, word_set, confirmed):
 while not found:
     word_list = getBest(word_set)
     print("Recommendations: ")
-    counter = 1
     for word in word_list:
-        print(f"{counter}: {word}")
-        counter += 1
+        print(f"{word[0]}")
 
     print()
-    word_rec = input("Please select a word: ")
+    word_rec = input("Please type a 5-letter word: ")
     update(word_rec, word_set, confirmed)
-    if len(word_set) < 10:
-        print(word_set)
+    if len(word_set) <= 1:
         found = True
 
 print(word_set)
