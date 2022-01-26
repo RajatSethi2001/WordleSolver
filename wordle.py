@@ -9,14 +9,15 @@ for word in copy.deepcopy(word_set):
         word_set.remove(word)
 
 found = False
-confirmed = []
+unconfirmed_positions = [x for x in range(5)]
 
-def getRemovals(word, word_set):
+def getRemovals(word_rec, word_set):
+    global unconfirmed_positions
     removals = 0
     word_set_copy = copy.deepcopy(word_set)
-    for letter in set(word):
+    for index in unconfirmed_positions:
         for word in copy.deepcopy(word_set_copy):
-            if letter in word:
+            if word_rec[index] in word:
                 word_set_copy.remove(word)
                 removals += 1
     
@@ -36,12 +37,15 @@ def getBest(word_set):
         top_words.reverse()
     return top_words
 
-def update(word_rec, word_set, confirmed):
+def update(word_rec, word_set):
+    global unconfirmed_positions
     print(f"The word is: {word_rec}")
     input(f"Attempt the word then press enter to continue.")
 
     unaccounted_positions = [x for x in range(len(word_rec))]
+    unconfirmed_positions = [x for x in range(len(word_rec))]
     confirming_phase = True
+    confirmed = []
     print("Are any letters in the correct location? If so, please enter their positions.")
     while confirming_phase:
         option = int(input("Enter Position (0 to continue): "))
@@ -56,6 +60,7 @@ def update(word_rec, word_set, confirmed):
             letter = word_rec[index]
             confirmed.append([letter, index])
             unaccounted_positions.remove(index)
+            unconfirmed_positions.remove(index)
             for word in copy.deepcopy(word_set):
                 if word[index] != letter:
                     word_set.remove(word)
@@ -82,12 +87,12 @@ def update(word_rec, word_set, confirmed):
                     temp = temp[0:rule[1]] + '*' + temp[rule[1] + 1:len(temp)]
                 if word[index] == letter or letter not in temp:
                     word_set.remove(word)
-        
-    for index in unaccounted_positions:
+
+    for index in range(5):
         letter = word_rec[index]
         expected = 0
         for x in misplaced + confirmed:
-            if x == letter:
+            if x[0] == letter:
                 expected += 1
 
         for word in copy.deepcopy(word_set):
@@ -96,13 +101,14 @@ def update(word_rec, word_set, confirmed):
 
 while not found:
     word_list = getBest(word_set)
+    print(len(word_set))
     print("Recommendations: ")
     for word in word_list:
-        print(f"{word[0]}")
+        print(f"{word}")
 
     print()
     word_rec = input("Please type a 5-letter word: ")
-    update(word_rec, word_set, confirmed)
+    update(word_rec, word_set)
     if len(word_set) <= 1:
         found = True
 
